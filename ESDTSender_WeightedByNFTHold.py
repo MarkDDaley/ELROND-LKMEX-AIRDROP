@@ -30,7 +30,7 @@ eligible_holders = data_df[data_df.Address.apply(lambda x: "qqqqqq" not in x)]
 
 # Compute the total of ESDT per address (given the number of NFT hold)
 # TMP FIX : Remove 0.1 ESDT per NFT to avoid "insufficient founds" (due to Python's loss of precision)
-airdrop_per_NFT = float(args.amount_airdrop) / (eligible_holders.Count.sum()) - 0.1
+airdrop_per_NFT = float(args.amount_airdrop) / (eligible_holders.Count.sum()) - 0.0000000000000001
 eligible_holders["Airdrop"] = airdrop_per_NFT * data_df.Count
 
 # ---------------------------------------------------------------- #
