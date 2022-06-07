@@ -29,16 +29,17 @@ data_df = pd.read_csv(args.filename)
 eligible_holders = data_df[data_df.Address.apply(lambda x: "qqqqqq" not in x)]
 
 # Compute the total of ESDT per address (given the number of NFT hold)
-# TMP FIX : Remove 0.1 ESDT per NFT to avoid "insufficient founds" (due to Python's loss of precision)
-airdrop_per_NFT = float(args.amount_airdrop) / (eligible_holders.Count.sum()) - 0.0000000000000001
+# TMP FIX : Remove 0.1 ESDT per NFT to avoid "insufficient funds" (due to Python's loss of precision)
+airdrop_per_NFT = float(args.amount_airdrop) / (eligible_holders.Count.sum())
 eligible_holders["Airdrop"] = airdrop_per_NFT * data_df.Count
 
 # ---------------------------------------------------------------- #
 #                         CONSTANTS
 # ---------------------------------------------------------------- #
 TOKEN_DECIMALS = 1000000000000000000  # 10^18 (18 decimals)
-TOKEN_COLLECTION = "MEX-dc289c"
+TOKEN_COLLECTION = "AERO-458bbf"
 TOKEN_ID = args.id
+MESSAGE = "June 2022 Helios Mitya Distribution"
 
 
 # ---------------------------------------------------------------- #
@@ -66,9 +67,8 @@ def int_to_BigInt(num):
 def sendLKMEX(owner, receiver, amount):
     payload = "ESDTTransfer@" + "@".join([text_to_hex(TOKEN_COLLECTION),
                                           num_to_hex(int_to_BigInt(amount)),
-                                          receiver.address.hex()])
-
-
+                                          receiver.address.hex(),
+                                          text_to_hex(MESSAGE)])
 
     tx = Transaction()
     tx.nonce = owner.nonce
@@ -76,7 +76,7 @@ def sendLKMEX(owner, receiver, amount):
     tx.sender = owner.address.bech32()
     tx.receiver = receiver.address.bech32()
     tx.gasPrice = gas_price
-    tx.gasLimit = 500000
+    tx.gasLimit = 600000
     tx.data = payload
     tx.chainID = chain
     tx.version = tx_version
@@ -90,10 +90,10 @@ def sendLKMEX(owner, receiver, amount):
 # ---------------------------------------------------------------- #
 #                  SETTING MAINNET PARAMS
 # ---------------------------------------------------------------- #
-proxy_address = "https://devnet-gateway.elrond.com"
+proxy_address = "https://gateway.elrond.com"
 proxy = ElrondProxy(proxy_address)
 network = proxy.get_network_config()
-chain = "D"
+chain = network.chain_id
 gas_price = network.min_gas_price
 tx_version = network.min_tx_version
 
